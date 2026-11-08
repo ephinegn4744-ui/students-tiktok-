@@ -3,101 +3,161 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ephi TikTok</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ephi Tube</title>
 <style>
 *{box-sizing:border-box}
-body{
- margin:0;background:#080808;color:white;
- font-family:Arial,sans-serif;
-}
+body{margin:0;background:#000;color:white;font-family:Arial}
 header{
- height:55px;display:flex;align-items:center;
- justify-content:space-between;padding:0 16px;
- border-bottom:1px solid #292929;
- position:sticky;top:0;background:#080808;
+height:55px;display:flex;justify-content:space-between;
+align-items:center;padding:0 16px;background:#090909;
 }
 .logo{font-size:23px;font-weight:bold}
 .logo span{color:#ff3155}
-.feed{max-width:500px;margin:auto;padding:15px}
-.video{
- height:70vh;min-height:400px;
- background:#202020;border-radius:14px;
- position:relative;overflow:hidden;
- display:flex;align-items:center;
- justify-content:center;margin-bottom:20px;
+.feed{
+height:calc(100dvh - 125px);
+overflow-y:auto;scroll-snap-type:y mandatory;
+scrollbar-width:none;
 }
-video{width:100%;height:100%;object-fit:cover}
-.upload{
- position:absolute;top:50%;left:50%;
- transform:translate(-50%,-50%);
- background:#333;padding:12px;border-radius:10px;
+.feed::-webkit-scrollbar{display:none}
+.card{
+height:100%;min-height:400px;position:relative;
+background:#202020;scroll-snap-align:start;
+overflow:hidden;
+}
+.card video{
+width:100%;height:100%;object-fit:contain;
+background:#111;
+}
+.info{
+position:absolute;bottom:25px;left:15px;
+max-width:75%;text-shadow:0 1px 4px #000;
 }
 .actions{
- position:absolute;right:12px;bottom:65px;
- display:grid;gap:18px;text-align:center;
- font-size:23px;
+position:absolute;right:12px;bottom:90px;
+display:flex;flex-direction:column;gap:15px;
+align-items:center;
 }
 .actions button{
- background:none;border:0;color:white;
- font-size:25px;
+background:none;border:0;color:white;
+font-size:29px;cursor:pointer;
 }
-.info{position:absolute;bottom:12px;left:12px}
+.actions small{font-size:13px}
 nav{
- position:fixed;bottom:0;left:0;width:100%;
- background:#111;border-top:1px solid #333;
- display:flex;justify-content:space-around;
- padding:14px;z-index:5;
+height:70px;position:fixed;bottom:0;width:100%;
+background:#101010;display:flex;
+justify-content:space-around;align-items:center;
 }
-nav a{color:white;text-decoration:none}
-input[type=file]{display:none}
+nav button{
+background:none;border:0;color:white;
+font-size:15px;
+}
+.upload{
+display:block;background:#ff3155;color:white;
+padding:12px;margin:10px auto;border-radius:8px;
+text-align:center;width:90%;cursor:pointer;
+}
+input{display:none}
 </style>
 </head>
 <body>
+
 <header>
 <div class="logo">Ephi <span>Tube</span></div>
 <div>🔍</div>
 </header>
 
-<main class="feed">
-<div class="video" id="videoBox">
-<div class="upload">🎬 Upload a video</div>
-<video id="player" controls loop playsinline></video>
-<div class="actions">
-<button onclick="like()">❤️</button>
-<span id="likes">0</span>
-<button onclick="alert('Comments coming soon!')">💬</button>
-<button onclick="alert('Share coming soon!')">↗️</button>
+<main class="feed" id="feed">
+<div style="padding:30px;text-align:center">
+<h2>Welcome to Ephi Tube 🎬</h2>
+<p>Upload your first video!</p>
 </div>
-<div class="info">
-<b>@EphiCreator</b>
-<p>Welcome to Ephi Tube! 🎬</p>
-</div>
-</div>
-<label for="file">➕ Upload Video</label>
-<input id="file" type="file" accept="video/*">
 </main>
 
+<label class="upload" for="files">
+➕ Upload Videos
+</label>
+<input id="files" type="file" accept="video/*" multiple>
+
 <nav>
-<a href="#">🏠 Home</a>
-<a href="#file">➕ Upload</a>
-<a href="#">👤 Profile</a>
+<button>🏠 Home</button>
+<button onclick="document.getElementById('files').click()">➕ Upload</button>
+<button onclick="alert('Profile coming soon!')">👤 Profile</button>
 </nav>
 
 <script>
-let count=0;
-function like(){
- count++;
- document.getElementById('likes').textContent=count;
+const feed=document.getElementById('feed');
+
+function addVideo(file){
+ const url=URL.createObjectURL(file);
+ const card=document.createElement('div');
+ card.className='card';
+
+ card.innerHTML=`
+ <video src="${url}" loop muted playsinline></video>
+ <div class="info">
+ <b>@EphiCreator</b>
+ <p>${file.name}</p>
+ </div>
+ <div class="actions">
+ <button class="like">❤️</button>
+ <small class="count">0</small>
+ <button class="comment">💬</button>
+ <button class="share">↗️</button>
+ <button class="sound">🔇</button>
+ </div>`;
+
+ const video=card.querySelector('video');
+ const like=card.querySelector('.like');
+ const count=card.querySelector('.count');
+
+ like.onclick=()=>{
+  const active=like.dataset.liked==='yes';
+  like.dataset.liked=active?'no':'yes';
+  like.textContent=active?'❤️':'💖';
+  count.textContent=active?'0':'1';
+ };
+
+ card.querySelector('.comment').onclick=()=>{
+  const comment=prompt('Write a comment:');
+  if(comment) alert('Comment: '+comment);
+ };
+
+ card.querySelector('.share').onclick=async()=>{
+  if(navigator.share){
+   try{await navigator.share({title:'Ephi Tube',url:location.href})}
+   catch(e){}
+  }else{
+   alert('Share Ephi Tube: '+location.href);
+  }
+ };
+
+ card.querySelector('.sound').onclick=()=>{
+  video.muted=!video.muted;
+  card.querySelector('.sound').textContent=
+  video.muted?'🔇':'🔊';
+ };
+
+ feed.appendChild(card);
+ observer.observe(video);
 }
-document.getElementById('file').onchange=function(){
- const file=this.files[0];
- if(file){
- const player=document.getElementById('player');
- player.src=URL.createObjectURL(file);
- player.play();
- document.querySelector('.upload').style.display='none';
- }
+
+const observer=new IntersectionObserver(entries=>{
+ entries.forEach(entry=>{
+  const video=entry.target;
+  if(entry.isIntersecting){
+   video.play().catch(()=>{});
+  }else{
+   video.pause();
+  }
+ });
+},{threshold:0.65});
+
+document.getElementById('files').onchange=function(){
+ [...this.files].forEach(file=>{
+  if(file.type.startsWith('video/'))addVideo(file);
+ });
+ this.value='';
 };
 </script>
 </body>
