@@ -63,18 +63,72 @@ input{display:none}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
 
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  updateProfile
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyAu7Hp7pkiaXP5cRIu9gbXQDw1-gL1Wu4",
   authDomain: "student-tube-7849d.firebaseapp.com",
   projectId: "student-tube-7849d",
   storageBucket: "student-tube-7849d.firebasestorage.app",
   messagingSenderId: "396004610547",
-  appId: "1:396004610547:web:4b340225a6ddd763b50286"
+  appId: "1:004004610547:web:4b340225a6ddd763b50286"
 };
 
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-console.log("Student Tube Firebase Connected!");
+const message = document.getElementById("authMessage");
+
+document.getElementById("signupBtn").onclick = async () => {
+  const name = document.getElementById("fullName").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  if (!name || !email || password.length < 6) {
+    message.textContent = "Enter your name, email and password (6+ characters).";
+    return;
+  }
+
+  try {
+    const result = await createUserWithEmailAndPassword(auth, email, password);
+    await updateProfile(result.user, { displayName: name });
+    message.textContent = "Account created successfully!";
+  } catch (error) {
+    message.textContent = error.message;
+  }
+};
+
+document.getElementById("loginBtn").onclick = async () => {
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    message.textContent = "Login successful!";
+  } catch (error) {
+    message.textContent = error.message;
+  }
+};
+
+document.getElementById("logoutBtn").onclick = async () => {
+  await signOut(auth);
+};
+
+onAuthStateChanged(auth, user => {
+  document.getElementById("authBox").style.display = user ? "none" : "block";
+  document.getElementById("userBox").style.display = user ? "block" : "none";
+
+  if (user) {
+    document.getElementById("welcomeUser").textContent =
+      "Welcome, " + (user.displayName || user.email);
+  }
 </script>
 
 <body>
