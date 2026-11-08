@@ -83,6 +83,30 @@ console.log("Student Tube Firebase Connected!");
 <div class="logo">Ephi <span>Tube</span></div>
 <div>🔍</div>
 </header>
+<section id="authBox" style="padding:20px;text-align:center">
+  <h2>Student Tube 👋</h2>
+  <p>Create your student account</p>
+
+  <input id="fullName" placeholder="Full Name"
+    style="display:block;width:90%;padding:13px;margin:10px auto">
+
+  <input id="email" type="email" placeholder="Email Address"
+    style="display:block;width:90%;padding:13px;margin:10px auto">
+
+  <input id="password" type="password" placeholder="Password (6+ characters)"
+    style="display:block;width:90%;padding:13px;margin:10px auto">
+
+  <button id="signupBtn">Create Account</button>
+  <button id="loginBtn">Login</button>
+
+  <p id="authMessage"></p>
+</section>
+
+<div id="userBox" style="display:none;padding:15px">
+  <span id="welcomeUser"></span>
+  <button id="logoutBtn">Logout</button>
+</div>
+
 
 <main class="feed" id="feed">
 <div style="padding:30px;text-align:center">
